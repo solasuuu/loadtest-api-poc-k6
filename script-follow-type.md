@@ -1,17 +1,17 @@
 # Load Testing Script Examples with k6
 
-This document provides script examples for different types of performance testing using k6 with TypeScript.
+เอกสารนี้แสดงตัวอย่างสคริปต์สำหรับการทดสอบประสิทธิภาพแบบต่างๆ โดยใช้ k6 กับ TypeScript
 
 ## 1. Load Testing
 
-**Purpose**: Test how the system performs under expected normal usage with increasing numbers of users.
+**วัตถุประสงค์**: ทดสอบว่าระบบทำงานได้อย่างไรภายใต้การใช้งานปกติที่คาดหวังไว้โดยมีจำนวนผู้ใช้ที่เพิ่มขึ้น
 
-**Required Test Data**:
+**ข้อมูลที่จำเป็นสำหรับการทดสอบ**:
 
-- Target user count (VUs)
-- Ramp-up period
-- Test duration
-- Endpoint(s) to test
+- จำนวนผู้ใช้เป้าหมาย (VUs) (`options.stages[].target`)
+- ช่วงเวลาในการเพิ่มจำนวนผู้ใช้ (`options.stages[].duration`)
+- ระยะเวลาการทดสอบ (`options.stages[].duration`)
+- จุดปลายทาง (Endpoint) ที่ต้องการทดสอบ (`http.get`)
 
 ```typescript
 import http from 'k6/http';
@@ -19,13 +19,13 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '2m', target: 100 }, // Ramp-up to 100 users over 2 minutes
-    { duration: '5m', target: 100 }, // Stay at 100 users for 5 minutes
-    { duration: '2m', target: 0 },   // Ramp-down to 0 users
+    { duration: '2m', target: 100 }, // เพิ่มผู้ใช้เป็น 100 คนในเวลา 2 นาที
+    { duration: '5m', target: 100 }, // คงจำนวนผู้ใช้ที่ 100 คนเป็นเวลา 5 นาที
+    { duration: '2m', target: 0 },   // ลดจำนวนผู้ใช้เป็น 0 คน
   ],
   thresholds: {
-    http_req_duration: ['p95<500'], // 95% of requests must complete below 500ms
-    'http_req_duration{staticAsset:yes}': ['p95<100'], // 95% of static asset requests must complete below 100ms
+    http_req_duration: ['p95<500'], // 95% ของการร้องขอต้องเสร็จสิ้นภายใน 500 มิลลิวินาที
+    'http_req_duration{staticAsset:yes}': ['p95<100'], // 95% ของการร้องขอไฟล์สถิตต้องเสร็จสิ้นภายใน 100 มิลลิวินาที
   },
 };
 
@@ -43,14 +43,14 @@ export default function () {
 
 ## 2. Stress Testing
 
-**Purpose**: Test how the system performs under extreme conditions, beyond expected peak load.
+**วัตถุประสงค์**: ทดสอบว่าระบบทำงานได้อย่างไรภายใต้สภาวะที่รุนแรง เกินกว่าโหลดสูงสุดที่คาดไว้
 
-**Required Test Data**:
+**ข้อมูลที่จำเป็นสำหรับการทดสอบ**:
 
-- Maximum VU count (much higher than normal)
-- Short ramp-up period
-- Test duration
-- Error thresholds
+- จำนวน VU สูงสุด (สูงกว่าปกติมาก) (`options.stages[].target`)
+- ช่วงเวลาการเพิ่มจำนวนผู้ใช้ที่สั้น (`options.stages[].duration`)
+- ระยะเวลาการทดสอบ (`options.stages[].duration`)
+- เกณฑ์ความผิดพลาดที่ยอมรับได้ (`options.thresholds.http_req_failed`)
 
 ```typescript
 import http from 'k6/http';
@@ -58,14 +58,14 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '2m', target: 100 },   // Normal load
-    { duration: '5m', target: 1000 },  // Ramp to stress level (10x normal)
-    { duration: '2m', target: 2000 },  // Peak stress
-    { duration: '5m', target: 0 },     // Recovery
+    { duration: '2m', target: 100 },   // โหลดปกติ
+    { duration: '5m', target: 1000 },  // เพิ่มไปถึงระดับความเครียด (10x ของปกติ)
+    { duration: '2m', target: 2000 },  // ความเครียดสูงสุด
+    { duration: '5m', target: 0 },     // ช่วงการฟื้นตัว
   ],
   thresholds: {
-    http_req_duration: ['p95<2000'], // Less strict threshold for stress test
-    http_req_failed: ['rate<0.1'],   // Error rate under 10%
+    http_req_duration: ['p95<2000'], // เกณฑ์ที่ผ่อนปรนกว่าสำหรับการทดสอบความเครียด
+    http_req_failed: ['rate<0.1'],   // อัตราความผิดพลาดน้อยกว่า 10%
   },
 };
 
@@ -76,20 +76,20 @@ export default function () {
     'status is 200': (r) => r.status === 200,
   });
   
-  // Shorter sleep to increase load intensity
+  // ระยะเวลาพักสั้นลงเพื่อเพิ่มความเข้มข้นของโหลด
   sleep(0.3);
 }
 ```
 
 ## 3. Endurance Testing (Soak Testing)
 
-**Purpose**: Test how the system performs over an extended period to identify issues like memory leaks.
+**วัตถุประสงค์**: ทดสอบว่าระบบทำงานได้อย่างไรในระยะเวลานานเพื่อระบุปัญหาเช่นการรั่วไหลของหน่วยความจำ
 
-**Required Test Data**:
+**ข้อมูลที่จำเป็นสำหรับการทดสอบ**:
 
-- Moderate VU count
-- Extended test duration (hours)
-- Memory usage metrics
+- จำนวน VU ปานกลาง (`options.stages[].target`)
+- ระยะเวลาการทดสอบที่ยาวนาน (หลายชั่วโมง) (`options.stages[].duration`)
+- ตัวชี้วัดการใช้หน่วยความจำ (`options.thresholds.http_req_failed`)
 
 ```typescript
 import http from 'k6/http';
@@ -97,13 +97,13 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '10m', target: 100 },  // Ramp-up
-    { duration: '8h', target: 100 },   // Stay at target for 8 hours
-    { duration: '10m', target: 0 },    // Ramp-down
+    { duration: '10m', target: 100 },  // ช่วงเพิ่มจำนวนผู้ใช้
+    { duration: '8h', target: 100 },   // คงจำนวนผู้ใช้ไว้ที่เป้าหมายเป็นเวลา 8 ชั่วโมง
+    { duration: '10m', target: 0 },    // ช่วงลดจำนวนผู้ใช้
   ],
   thresholds: {
     http_req_duration: ['p95<500'],
-    http_req_failed: ['rate<0.01'],    // Stricter error rate for endurance
+    http_req_failed: ['rate<0.01'],    // อัตราความผิดพลาดที่เข้มงวดมากขึ้นสำหรับการทดสอบความทนทาน
   },
 };
 
@@ -114,27 +114,27 @@ export default function () {
     ['GET', 'https://api.example.com/orders'],
   ]);
   
-  // Check each response
+  // ตรวจสอบแต่ละการตอบสนอง
   responses.forEach((res, index) => {
     check(res, {
       'status is 200': (r) => r.status === 200,
     });
   });
   
-  sleep(3); // Longer sleep to represent realistic user behavior
+  sleep(3); // ระยะเวลาพักที่นานขึ้นเพื่อจำลองพฤติกรรมผู้ใช้ที่สมจริง
 }
 ```
 
 ## 4. Spike Testing
 
-**Purpose**: Test how the system handles sudden, large increases in load.
+**วัตถุประสงค์**: ทดสอบว่าระบบจัดการกับการเพิ่มขึ้นของโหลดอย่างกะทันหันและจำนวนมากได้อย่างไร
 
-**Required Test Data**:
+**ข้อมูลที่จำเป็นสำหรับการทดสอบ**:
 
-- Baseline VU count
-- Peak VU count (very high)
-- Very short ramp-up period
-- Recovery period
+- จำนวน VU พื้นฐาน (`options.stages[].target`)
+- จำนวน VU สูงสุด (สูงมาก) (`options.stages[].target`)
+- ช่วงเวลาเพิ่มจำนวนผู้ใช้ที่สั้นมาก (`options.stages[].duration`)
+- ช่วงเวลาการฟื้นตัว (`options.stages[].duration`)
 
 ```typescript
 import http from 'k6/http';
@@ -142,14 +142,14 @@ import { check, sleep } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '1m', target: 50 },    // Normal load
-    { duration: '10s', target: 1000 }, // Spike to 1000 users in just 10 seconds
-    { duration: '3m', target: 1000 },  // Stay at spike level
-    { duration: '1m', target: 50 },    // Scale back to normal
-    { duration: '3m', target: 50 },    // Normal load again to see recovery
+    { duration: '1m', target: 50 },    // โหลดปกติ
+    { duration: '10s', target: 1000 }, // เพิ่มเป็น 1000 ผู้ใช้ในเวลาเพียง 10 วินาที
+    { duration: '3m', target: 1000 },  // คงที่ที่ระดับสูงสุด
+    { duration: '1m', target: 50 },    // ลดกลับสู่ระดับปกติ
+    { duration: '3m', target: 50 },    // โหลดปกติอีกครั้งเพื่อดูการฟื้นตัว
   ],
   thresholds: {
-    http_req_failed: ['rate<0.15'], // Allow higher error rate during spike
+    http_req_failed: ['rate<0.15'], // อนุญาตให้มีอัตราข้อผิดพลาดที่สูงขึ้นในช่วงการเพิ่มโหลดแบบกะทันหัน
   },
 };
 
@@ -167,43 +167,43 @@ export default function () {
 
 ## 5. Scalability Testing
 
-**Purpose**: Test how well the system scales with increasing load by gradually adding users.
+**วัตถุประสงค์**: ทดสอบว่าระบบสามารถขยายตัวรองรับการเพิ่มขึ้นของโหลดได้ดีแค่ไหน โดยค่อยๆ เพิ่มจำนวนผู้ใช้
 
-**Required Test Data**:
+**ข้อมูลที่จำเป็นสำหรับการทดสอบ**:
 
-- Multiple increasing load levels
-- Performance metrics at each level
-- Enough duration at each level to measure steady state
+- ระดับของโหลดที่เพิ่มขึ้นหลายระดับ (`options.stages[].target`)
+- ตัวชี้วัดประสิทธิภาพในแต่ละระดับ (`responseTimeByLevel`)
+- ระยะเวลาที่เพียงพอในแต่ละระดับเพื่อวัดสถานะคงที่ (`options.stages[].duration`)
 
 ```typescript
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { Trend } from 'k6/metrics';
 
-// Custom metrics to track performance at different load levels
+// เมตริกที่กำหนดเองเพื่อติดตามประสิทธิภาพที่ระดับโหลดต่างๆ
 const responseTimeByLevel = new Trend('response_time_by_level');
 
 export const options = {
   stages: [
-    { duration: '3m', target: 100 },   // Level 1
+    { duration: '3m', target: 100 },   // ระดับที่ 1
     { duration: '5m', target: 100 },
-    { duration: '3m', target: 200 },   // Level 2
+    { duration: '3m', target: 200 },   // ระดับที่ 2
     { duration: '5m', target: 200 },
-    { duration: '3m', target: 300 },   // Level 3
+    { duration: '3m', target: 300 },   // ระดับที่ 3
     { duration: '5m', target: 300 },
-    { duration: '3m', target: 400 },   // Level 4
+    { duration: '3m', target: 400 },   // ระดับที่ 4
     { duration: '5m', target: 400 },
-    { duration: '3m', target: 0 },     // Ramp-down
+    { duration: '3m', target: 0 },     // ช่วงลดจำนวนผู้ใช้
   ],
   thresholds: {
-    http_req_duration: ['p95<1000'], // Overall performance threshold
+    http_req_duration: ['p95<1000'], // เกณฑ์ประสิทธิภาพโดยรวม
   },
 };
 
 export default function () {
   const startTime = new Date().getTime();
   
-  // Get current level based on VU count
+  // ระบุระดับปัจจุบันจากจำนวน VU
   let currentLevel = 1;
   if (__VU > 100) currentLevel = 2;
   if (__VU > 200) currentLevel = 3;
@@ -211,7 +211,7 @@ export default function () {
   
   const res = http.get('https://api.example.com/scalability-test');
   
-  // Record response time for current load level
+  // บันทึกเวลาตอบสนองสำหรับระดับโหลดปัจจุบัน
   responseTimeByLevel.add(res.timings.duration, { level: currentLevel });
   
   check(res, {
@@ -224,13 +224,13 @@ export default function () {
 
 ## 6. Concurrency Testing
 
-**Purpose**: Test how the system handles multiple users accessing or modifying the same resource simultaneously.
+**วัตถุประสงค์**: ทดสอบว่าระบบจัดการกับการที่ผู้ใช้หลายคนเข้าถึงหรือแก้ไขทรัพยากรเดียวกันพร้อมกันได้อย่างไร
 
-**Required Test Data**:
+**ข้อมูลที่จำเป็นสำหรับการทดสอบ**:
 
-- High VU count
-- Shared resource being accessed/modified
-- Proper assertions to verify data integrity
+- จำนวน VU สูง (`options.vus`)
+- ทรัพยากรที่ใช้ร่วมกันที่กำลังถูกเข้าถึง/แก้ไข (`resourceId`)
+- การตรวจสอบที่เหมาะสมเพื่อยืนยันความถูกต้องของข้อมูล (`check`)
 
 ```typescript
 import http from 'k6/http';
@@ -242,22 +242,22 @@ export const options = {
   duration: '1m',
   thresholds: {
     http_req_duration: ['p95<1000'],
-    http_req_failed: ['rate<0.01'],  // Strict on errors for concurrency issues
+    http_req_failed: ['rate<0.01'],  // เข้มงวดเรื่องข้อผิดพลาดสำหรับปัญหาการทำงานพร้อมกัน
   },
 };
 
 export default function () {
-  // All VUs attempting to access the same resource
+  // ทุก VU พยายามเข้าถึงทรัพยากรเดียวกัน
   const resourceId = '12345';
   
-  // Generate unique data for this VU
+  // สร้างข้อมูลที่ไม่ซ้ำกันสำหรับ VU นี้
   const itemData = {
     id: uuidv4(),
     vu: __VU,
     timestamp: new Date().toISOString(),
   };
   
-  // Try to update the same resource concurrently
+  // พยายามอัปเดตทรัพยากรเดียวกันพร้อมกัน
   const res = http.put(`https://api.example.com/resources/${resourceId}`, JSON.stringify(itemData), {
     headers: { 'Content-Type': 'application/json' },
   });
@@ -268,7 +268,7 @@ export default function () {
     'no concurrency errors': (r) => !r.body.includes('conflict'),
   });
   
-  // Verify the update was successful
+  // ตรวจสอบว่าการอัปเดตสำเร็จ
   const checkRes = http.get(`https://api.example.com/resources/${resourceId}`);
   
   check(checkRes, {
@@ -281,31 +281,31 @@ export default function () {
 
 ## 7. Performance Testing
 
-**Purpose**: Test overall system response times, throughput, and resource utilization under a specific load.
+**วัตถุประสงค์**: ทดสอบเวลาตอบสนองของระบบโดยรวม ปริมาณงานที่ทำได้ และการใช้ทรัพยากรภายใต้โหลดที่กำหนด
 
-**Required Test Data**:
+**ข้อมูลที่จำเป็นสำหรับการทดสอบ**:
 
-- Representative user count
-- Typical user flows
-- Specific performance thresholds
+- จำนวนผู้ใช้ที่เป็นตัวแทน (`options.vus`)
+- ขั้นตอนการใช้งานแบบทั่วไปของผู้ใช้ (`group`)
+- เกณฑ์ประสิทธิภาพเฉพาะ (`options.thresholds`)
 
 ```typescript
 import http from 'k6/http';
 import { check, sleep, group } from 'k6';
 import { Trend } from 'k6/metrics';
 
-// Custom metrics
+// เมตริกที่กำหนดเอง
 const loginTrend = new Trend('login_time');
 const searchTrend = new Trend('search_time');
 const checkoutTrend = new Trend('checkout_time');
 
 export const options = {
-  vus: 50,  // Moderate, realistic load
+  vus: 50,  // โหลดที่สมจริงปานกลาง
   duration: '5m',
   thresholds: {
-    'login_time': ['p95<500'],     // Login must be fast
-    'search_time': ['p95<800'],    // Search has more time allowance
-    'checkout_time': ['p95<1000'], // Checkout can be slightly slower
+    'login_time': ['p95<500'],     // การเข้าสู่ระบบต้องรวดเร็ว
+    'search_time': ['p95<800'],    // การค้นหามีเวลาที่ผ่อนปรนมากขึ้น
+    'checkout_time': ['p95<1000'], // การชำระเงินสามารถช้าได้เล็กน้อย
     http_req_failed: ['rate<0.01'],
   },
 };
@@ -377,12 +377,12 @@ export default function () {
 
 ## 8. Smoke Testing
 
-**Purpose**: Quick test to verify the API endpoints are operational before more intensive testing.
+**วัตถุประสงค์**: ทดสอบอย่างรวดเร็วเพื่อตรวจสอบว่าจุดปลายทาง API ทำงานได้ก่อนที่จะทำการทดสอบที่เข้มข้นมากขึ้น
 
-**Required Test Data**:
+**ข้อมูลที่จำเป็นสำหรับการทดสอบ**:
 
-- List of critical endpoints
-- Minimal number of VUs
+- รายการของจุดปลายทางที่สำคัญ (`endpoints`)
+- จำนวน VU ขั้นต่ำ (`options.vus`)
 
 ```typescript
 import http from 'k6/http';
@@ -392,14 +392,14 @@ export const options = {
   vus: 1,
   duration: '30s',
   thresholds: {
-    http_req_failed: ['rate=0'], // No errors allowed in smoke test
+    http_req_failed: ['rate=0'], // ไม่อนุญาตให้มีข้อผิดพลาดในการทดสอบแบบ smoke test
   },
 };
 
 export default function () {
   const baseUrl = 'https://api.example.com';
   
-  // Check critical endpoints
+  // ตรวจสอบจุดปลายทางที่สำคัญ
   const endpoints = [
     '/health',
     '/users',
@@ -423,13 +423,13 @@ export default function () {
 
 ## 9. Failover Testing
 
-**Purpose**: Test the system's ability to handle component failures and switch to backups.
+**วัตถุประสงค์**: ทดสอบความสามารถของระบบในการจัดการกับความล้มเหลวของส่วนประกอบและการสลับไปใช้ระบบสำรอง
 
-**Required Test Data**:
+**ข้อมูลที่จำเป็นสำหรับการทดสอบ**:
 
-- Details of failover mechanism
-- Methods to trigger failure
-- Recovery expectation
+- รายละเอียดของกลไกการสลับไปใช้ระบบสำรอง (`FAILOVER_START_TIME`, `FAILOVER_DURATION`)
+- วิธีการที่ใช้ในการกระตุ้นความล้มเหลว (`timeInTest`)
+- ความคาดหวังในการฟื้นตัว (`check`)
 
 ```typescript
 import http from 'k6/http';
@@ -438,33 +438,33 @@ import exec from 'k6/execution';
 
 export const options = {
   stages: [
-    { duration: '2m', target: 50 },   // Normal load
-    { duration: '5m', target: 50 },   // Steady load during failover
-    { duration: '2m', target: 0 },    // Ramp-down
+    { duration: '2m', target: 50 },   // โหลดปกติ
+    { duration: '5m', target: 50 },   // โหลดคงที่ระหว่างการสลับไปใช้ระบบสำรอง
+    { duration: '2m', target: 0 },    // ช่วงลดจำนวนผู้ใช้
   ],
   thresholds: {
-    http_req_failed: ['rate<0.10'],   // Allow some errors during failover
+    http_req_failed: ['rate<0.10'],   // อนุญาตให้มีข้อผิดพลาดบางส่วนในระหว่างการสลับไปใช้ระบบสำรอง
   },
 };
 
-// Simulate external trigger for failover (in reality this would be triggered outside k6)
-const FAILOVER_START_TIME = 120; // seconds into the test
-const FAILOVER_DURATION = 60;    // seconds
+// จำลองตัวกระตุ้นภายนอกสำหรับการสลับไปใช้ระบบสำรอง (ในความเป็นจริงจะถูกกระตุ้นจากภายนอก k6)
+const FAILOVER_START_TIME = 120; // วินาทีในการทดสอบ
+const FAILOVER_DURATION = 60;    // วินาที
 
 export default function () {
   const timeInTest = exec.scenario.iterationInTest / 1000;
   let endpoint = 'https://api.example.com';
   
-  // Check if we're in the failover window
+  // ตรวจสอบว่าเราอยู่ในช่วงเวลาการสลับไปใช้ระบบสำรองหรือไม่
   if (timeInTest > FAILOVER_START_TIME && timeInTest < (FAILOVER_START_TIME + FAILOVER_DURATION)) {
-    console.log('Testing during simulated failover period');
+    console.log('ทดสอบในช่วงการจำลองสถานการณ์การสลับไปใช้ระบบสำรอง');
   }
   
   const res = http.get(`${endpoint}/status`);
   
   check(res, {
-    'still responds during failover': (r) => r.status < 500, // May return 200-499 but should not be server error
-    'recovery time acceptable': (r) => r.timings.duration < 2000, // Allow higher latency during failover
+    'still responds during failover': (r) => r.status < 500, // อาจจะคืนค่า 200-499 แต่ไม่ควรเป็นข้อผิดพลาดของเซิร์ฟเวอร์
+    'recovery time acceptable': (r) => r.timings.duration < 2000, // อนุญาตให้มีความล่าช้ามากขึ้นระหว่างการสลับไปใช้ระบบสำรอง
   });
   
   sleep(1);
@@ -473,13 +473,13 @@ export default function () {
 
 ## 10. Capacity Testing
 
-**Purpose**: Determine maximum capacity before performance degrades.
+**วัตถุประสงค์**: กำหนดความสามารถสูงสุดก่อนที่ประสิทธิภาพจะลดลง
 
-**Required Test Data**:
+**ข้อมูลที่จำเป็นสำหรับการทดสอบ**:
 
-- Incrementally increasing load levels
-- Clear performance thresholds
-- Metrics to determine saturation points
+- ระดับโหลดที่เพิ่มขึ้นอย่างต่อเนื่อง (`options.stages[].target`)
+- เกณฑ์ประสิทธิภาพที่ชัดเจน (`options.thresholds`)
+- ตัวชี้วัดเพื่อกำหนดจุดอิ่มตัว (`responseTimeByVU`)
 
 ```typescript
 import http from 'k6/http';
@@ -490,7 +490,7 @@ const responseTimeByVU = new Trend('response_time_by_vu_count');
 
 export const options = {
   stages: [
-    // Incrementally increase load to find breaking point
+    // เพิ่มโหลดอย่างต่อเนื่องเพื่อหาจุดแตกหัก
     { duration: '2m', target: 100 },
     { duration: '3m', target: 100 },
     { duration: '2m', target: 200 },
@@ -508,16 +508,16 @@ export const options = {
 export default function () {
   const res = http.get('https://api.example.com/capacity-test-endpoint');
   
-  // Record response time with current VU count
+  // บันทึกเวลาตอบสนองพร้อมกับจำนวน VU ปัจจุบัน
   responseTimeByVU.add(res.timings.duration, { vus: __VU });
   
   check(res, {
     'status is 200': (r) => r.status === 200,
   });
   
-  // Track error rate as that's a key capacity indicator
+  // ติดตามอัตราข้อผิดพลาดเนื่องจากเป็นตัวบ่งชี้ความจุที่สำคัญ
   if (res.status >= 400) {
-    console.warn(`Error detected at VU level: ${__VU}, status: ${res.status}`);
+    console.warn(`ตรวจพบข้อผิดพลาดที่ระดับ VU: ${__VU}, สถานะ: ${res.status}`);
   }
   
   sleep(1);
@@ -526,11 +526,9 @@ export default function () {
 
 ## Best Practices for k6 API Load Testing
 
-1. **Start with Smoke Tests**: Always begin with smoke tests to make sure your API is working before running intensive tests.
-2. **Set Realistic Thresholds**: Define appropriate thresholds based on SLAs or performance goals.
-3. **Monitor Resource Usage**: Watch server metrics alongside k6 metrics to identify bottlenecks.
-4. **Use Proper Authentication**: Ensure your test scripts handle authentication properly if testing secured endpoints.
-5. **Data Correlation**: Extract values from responses and use them in subsequent requests when needed.
-6. **Parameterize Test Data**: Use CSV files or other external data sources for large test data sets.
-7. **Gradually Increase Load**: Don't jump straight to maximum load; gradually increase to identify exact breaking points.
-8. **Mind Local Resources**: Remember that k6 itself consumes resources, which can affect test results when run locally.
+1. **เริ่มต้นด้วย Smoke Tests**: ควรเริ่มต้นด้วยการทดสอบแบบ smoke test เพื่อให้แน่ใจว่า API ของคุณทำงานได้ก่อนที่จะทำการทดสอบที่เข้มข้น
+2. **กำหนดเกณฑ์ที่สมจริง**: กำหนดเกณฑ์ที่เหมาะสมตาม SLA หรือเป้าหมายประสิทธิภาพ
+3. **ติดตามการใช้ทรัพยากร**: ดูเมตริกของเซิร์ฟเวอร์ควบคู่ไปกับเมตริกของ k6 เพื่อระบุคอขวด
+4. **ใช้การรับรองความถูกต้องที่เหมาะสม**: ตรวจสอบว่าสคริปต์ทดสอบของคุณจัดการกับการรับรองความถูกต้องอย่างเหมาะสมหากทดสอบจุดปลายทางที่มีการรักษาความปลอดภัย
+5. **ความสัมพันธ์ของข้อมูล**: ดึงค่าจากการตอบสนองและใช้ในคำขอถัดไปเมื่อจำเป็น
+6. **พารามิเตอร์ข้อมูลทดสอบ**: ใช้ไฟล์ CSV หรือแหล่งข้อมูลภายนอกอื่นๆ สำหรับชุดข้อมูล
