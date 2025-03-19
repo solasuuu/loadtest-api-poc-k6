@@ -1,5 +1,7 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
+// @ts-ignore
+import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js'
 
 export const options = {
   // รูปแบบ 1: ใช้ iterations - จะรัน 10 ครั้งแล้วจบ
@@ -43,7 +45,7 @@ export default function () {
   const res = http.get('https://jsonplaceholder.typicode.com/users');
 
   check(res, {
-    'status is 200': (r) => r.status === 201,
+    'status is 200': (r) => r.status === 200,
     'response time < 400ms': (r) => r.timings.duration < 400,
   });
   // console.log('\ndata_from_setup', data_from_setup)
@@ -53,22 +55,20 @@ export default function () {
 
 
 // ฟังก์ชัน setup ทำงานก่อนการทดสอบเริ่ม
-export function setup() {
-  console.log('Starting test execution');
-  return { startTime: new Date().toISOString() };
-}
+// export function setup() {
+//   console.log('!! Starting test execution');
+//   return { startTime: new Date().toISOString() };
+// }
 
-// ฟังก์ชัน teardown ทำงานหลังจากการทดสอบเสร็จสิ้น (ก่อน handleSummary)
-export function teardown(data: any) {
-  console.log(`Test execution completed. Started at: ${data.startTime}`);
-}
+// // ฟังก์ชัน teardown ทำงานหลังจากการทดสอบเสร็จสิ้น (ก่อน handleSummary)
+// export function teardown(data: any) {
+//   console.log(`!! Test execution completed. Started at: ${data.startTime}`);
+// }
 
 
 export function handleSummary(data: any) {
-  // const med_latency = data.metrics
-  // const latency_message = `The median latency was ${JSON.stringify(med_latency)}\n`;
   return {
     'summary.json': JSON.stringify(data),
-    // 'summary.txt': latency_message,
+    'stdout': textSummary(data, { indent: ' ', enableColors: true })
   };
 }
