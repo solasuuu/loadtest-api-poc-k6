@@ -1,0 +1,44 @@
+{
+  "regularUsers": [
+    {
+      "id": 1,
+      "username": "user1@example.com",
+      "password": "password123",
+      "role": "customer"
+    },
+    {
+      "id": 2,
+      "username": "user2@example.com",
+      "password": "password123",
+      "role": "customer"
+    },
+    {
+      "id": 3,
+      "username": "user3@example.com",
+      "password": "password123",
+      "role": "customer"
+    }
+  ],
+  "adminUsers": [
+    {
+      "id": 101,
+      "username": "admin@example.com",
+      "password": "adminpass123",
+      "role": "admin"
+    }
+  ],
+  "testUsers": [
+    {
+      "id": 1001,
+      "username": "test_user@example.com",
+      "password": "testpass123",
+      "role": "tester"
+    }
+  ],
+  "generatedUsers": {
+    "prefix": "generated_user_",
+    "domain": "example.com",
+    "password": "gen123pass",
+    "count": 1000
+  }
+}

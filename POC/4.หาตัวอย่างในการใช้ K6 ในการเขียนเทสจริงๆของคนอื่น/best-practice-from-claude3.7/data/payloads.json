@@ -1,0 +1,86 @@
+{
+  "orderTemplates": [
+    {
+      "template": "basic",
+      "payload": {
+        "items": [
+          {
+            "productId": "PRODUCT_ID",
+            "quantity": "QUANTITY",
+            "price": "PRICE"
+          }
+        ],
+        "shippingAddress": {
+          "street": "123 Test St",
+          "city": "Test City",
+          "state": "TS",
+          "zipCode": "12345",
+          "country": "Test Country"
+        },
+        "paymentMethod": {
+          "type": "credit_card",
+          "cardNumber": "XXXX-XXXX-XXXX-XXXX",
+          "expiryMonth": "MM",
+          "expiryYear": "YYYY"
+        }
+      }
+    },
+    {
+      "template": "digital",
+      "payload": {
+        "items": [
+          {
+            "productId": "PRODUCT_ID",
+            "quantity": "QUANTITY",
+            "price": "PRICE",
+            "isDigital": true
+          }
+        ],
+        "paymentMethod": {
+          "type": "paypal",
+          "email": "EMAIL"
+        }
+      }
+    }
+  ],
+  "userProfiles": [
+    {
+      "name": "John Doe",
+      "email": "EMAIL",
+      "preferences": {
+        "notifications": true,
+        "newsletter": false,
+        "theme": "dark"
+      },
+      "address": {
+        "street": "123 Main St",
+        "city": "Anytown",
+        "state": "AT",
+        "zipCode": "54321",
+        "country": "Any Country"
+      }
+    }
+  ],
+  "searchQueries": [
+    "smartphone",
+    "laptop",
+    "headphones",
+    "smartwatch",
+    "camera",
+    "tv",
+    "speaker",
+    "gaming console",
+    "tablet",
+    "monitor"
+  ],
+  "reviewTemplates": [
+    {
+      "rating": "RATING",
+      "title": "TITLE",
+      "comment": "COMMENT",
+      "productId": "PRODUCT_ID",
+      "userId": "USER_ID",
+      "verified": true
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{../../4.หาตัวอย่างในการใช้ K6 ในการเขียนเทสจริงๆของคนอื่น/4.หาตัวอย่างในการใช้ K6 ในการเขียนเทสจริงๆของคนอื่น/best-practice-from-claude3.7../../4.หาตัวอย่างในการใช้ K6 ในการเขียนเทสจริงๆของคนอื่น/4.หาตัวอย่างในการใช้ K6 ในการเขียนเทสจริงๆของคนอื่น/best-practice-from-claude3.7/**/*.ts../../4.หาตัวอย่างในการใช้ K6 ในการเขียนเทสจริงๆของคนอื่น/4.หาตัวอย่างในการใช้ K6 ในการเขียนเทสจริงๆของคนอื่น/best-practice-from-claude3.7/node_modules
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "commonjs",
+    "rootDir": "../4.หาตัวอย่างในการใช้ K6 ในการเขียนเทสจริงๆของคนอื่น/best-practice-from-claude3.7",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "include": [
+    "../4.หาตัวอย่างในการใช้ K6 ในการเขียนเทสจริงๆของคนอื่น/best-practice-from-claude3.7/**/*.ts"
+  ],
+  "exclude": [
+    "../4.หาตัวอย่างในการใช้ K6 ในการเขียนเทสจริงๆของคนอื่น/best-practice-from-claude3.7/node_modules"
+  ]
+}
