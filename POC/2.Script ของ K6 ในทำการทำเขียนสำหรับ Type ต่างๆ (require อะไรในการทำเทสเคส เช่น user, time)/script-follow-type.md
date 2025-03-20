@@ -201,7 +201,7 @@ export const options = {
 };
 
 export default function () {
-  const startTime = new Date().getTime();
+  // const startTime = new Date().getTime();
   
   // ระบุระดับปัจจุบันจากจำนวน VU
   let currentLevel = 1;
@@ -212,7 +212,7 @@ export default function () {
   const res = http.get('https://api.example.com/scalability-test');
   
   // บันทึกเวลาตอบสนองสำหรับระดับโหลดปัจจุบัน
-  responseTimeByLevel.add(res.timings.duration, { level: currentLevel });
+  responseTimeByLevel.add(res.timings.duration, { level: String(currentLevel) });
   
   check(res, {
     'status is 200': (r) => r.status === 200,
@@ -222,7 +222,7 @@ export default function () {
 }
 ```
 
-## 6. Concurrency Testing
+## 6. Concurrency Testing (SKIP)
 
 **วัตถุประสงค์**: ทดสอบว่าระบบจัดการกับการที่ผู้ใช้หลายคนเข้าถึงหรือแก้ไขทรัพยากรเดียวกันพร้อมกันได้อย่างไร
 

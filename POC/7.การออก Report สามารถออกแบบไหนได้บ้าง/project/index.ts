@@ -41,7 +41,7 @@ export const options = {
   },
 };
 
-export default function () {
+export default function () { // parameter สามารถรับมาจาก setup ได้
   const res = http.get('https://jsonplaceholder.typicode.com/users');
 
   check(res, {

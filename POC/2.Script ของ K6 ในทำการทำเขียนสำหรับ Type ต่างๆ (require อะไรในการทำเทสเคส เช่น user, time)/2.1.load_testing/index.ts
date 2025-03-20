@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 
 export const options = {
-  // ใช้ stages - จะรันตามระยะเวลาที่กำหนด (comment ไว้เพื่อแสดงความแตกต่าง)
+  // ใช้ stages - จะรันตามระยะเวลาที่กำหนด (comment ไว้เพื่อแสดงความแตกต่าง) // in reallity use s to m
   stages: [
     { duration: '2s', target: 5 },
     { duration: '2s', target: 10 },
@@ -32,9 +32,8 @@ export const options = {
   },
 };
 
-export default function (data_from_setup: any) {
+export default function () {
   const res = http.get('https://jsonplaceholder.typicode.com/users');
-
 
   check(res, {
     'status is 200': (r) => r.status === 200,
