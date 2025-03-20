@@ -45,6 +45,6 @@ const merged_report = {
 const gzip_buffer = await gzipPromise(JSON.stringify(merged_report));
 
 // Save the compressed data
-const save = Bun.file(`result.json.gz`);
+const save = Bun.file(`test-result.json.gz`);
 await save.write(gzip_buffer);
 console.log('File successfully compressed and saved as summary.json.gz');

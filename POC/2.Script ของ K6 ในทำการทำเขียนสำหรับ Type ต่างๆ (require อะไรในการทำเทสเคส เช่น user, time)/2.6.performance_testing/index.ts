@@ -2,7 +2,7 @@ import http from 'k6/http';
 import { check, sleep, group } from 'k6';
 import { Trend } from 'k6/metrics';
 
-// เมตริกที่กำหนดเอง
+// เมตริกที่กำหนดเอง (Custom Metrics/Trends จะไม่แสดง Graph Chart ใน K6 HTML แต่จะแสดงในสรุป Table)
 const loginTrend = new Trend('login_time');
 const searchTrend = new Trend('search_time');
 const checkoutTrend = new Trend('checkout_time');
@@ -32,8 +32,7 @@ export default function () {
     
     check(loginRes, {
       'login successful': (r) => r.status === 200,
-      // @ts-ignore
-      'user data returned': (r) => r.json().id !== undefined,
+      'user data returned': (r) => (r.json() as {id: string}).id !== undefined,
     });
     
     const user = loginRes?.json() as { id: string };
@@ -42,7 +41,7 @@ export default function () {
   
   sleep(1);
   
-  group('Search Products', function () {
+  group('Search Post', function () {
     const start = new Date();
     // ใช้การเรียกดูโพสต์แทนการค้นหาสินค้า
     const searchRes = http.get(`${baseUrl}/posts?userId=${userId}`);
@@ -51,14 +50,13 @@ export default function () {
     
     check(searchRes, {
       'search successful': (r) => r.status === 200,
-      // @ts-ignore
-      'results returned': (r) => r.json().length > 0,
+      'results returned': (r) => (r?.json() as {length: number})?.length > 0,
     });
   });
   
   sleep(2);
   
-  group('Checkout Process', function () {
+  group('Add Comment', function () {
     const start = new Date();
     // ใช้การส่งความคิดเห็นแทนการชำระเงิน
     const checkoutRes = http.post(`${baseUrl}/comments`, JSON.stringify({
@@ -73,9 +71,8 @@ export default function () {
     checkoutTrend.add(new Date().getTime() - start.getTime());
     
     check(checkoutRes, {
-      'checkout successful': (r) => r.status === 201,
-      // @ts-ignore
-      'comment created': (r) => r.json().id !== undefined,
+      'Comment successful': (r) => r.status === 201,
+      'Comment created': (r) => (r?.json() as {id: string})?.id !== undefined,
     });
   });
   

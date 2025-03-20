@@ -60,7 +60,8 @@ export default function () { // parameter สามารถรับมาจ�
 //   return { startTime: new Date().toISOString() };
 // }
 
-// // ฟังก์ชัน teardown ทำงานหลังจากการทดสอบเสร็จสิ้น (ก่อน handleSummary)
+
+// ฟังก์ชัน teardown ทำงานหลังจากการทดสอบเสร็จสิ้น (ก่อน handleSummary)
 // export function teardown(data: any) {
 //   console.log(`!! Test execution completed. Started at: ${data.startTime}`);
 // }
