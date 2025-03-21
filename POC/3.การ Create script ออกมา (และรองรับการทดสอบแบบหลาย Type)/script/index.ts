@@ -1,5 +1,6 @@
-const request_json = JSON.parse(await Bun.file('./request.json').text())
+import { loadtest_api_request } from "./request";
 
+const request_json = loadtest_api_request
 
 // {
 //   "auth": {

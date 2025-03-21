@@ -49,6 +49,7 @@ export default function () {
     check(res, {
       'users - status is 200': (r) => r.status === 200,
       'users - response time < 400ms': (r) => r.timings.duration < 400,
+      // @ts-ignore
       'users - has data': (r) => r.json().length > 0,
     });
     
@@ -75,6 +76,7 @@ export default function () {
     check(res, {
       'comments - status is 200': (r) => r.status === 200,
       'comments - response time < 600ms': (r) => r.timings.duration < 600,
+      // @ts-ignore
       'comments - body contains email field': (r) => r.json()[0].hasOwnProperty('email'),
     });
     
@@ -99,6 +101,7 @@ export default function () {
     
     check(res, {
       'create post - status is 201': (r) => r.status === 201,
+      // @ts-ignore
       'create post - has id': (r) => r.json().hasOwnProperty('id'),
     });
   });

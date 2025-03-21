@@ -1,6 +1,6 @@
 import type { T_LoadtestApiK6 } from './request.d';
 
-const request: T_LoadtestApiK6 = {
+export const loadtest_api_request: T_LoadtestApiK6 = {
   type: "load_testing",
   options: {
     thresholds: {
