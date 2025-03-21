@@ -1,6 +1,6 @@
-import type { T_LoadtestApiRequest } from './request.d';
+import type { T_LoadtestApiK6 } from './request.d';
 
-const request: T_LoadtestApiRequest = {
+const request: T_LoadtestApiK6 = {
   type: "load_testing",
   options: {
     thresholds: {
@@ -32,8 +32,7 @@ const request: T_LoadtestApiRequest = {
       },
       response: {
         type: "json",
-        status: 200,
-        check: [
+        validate: [
           {
             ref: "$.access_token",
             rule: "not_null,string"
@@ -73,6 +72,16 @@ const request: T_LoadtestApiRequest = {
               {
                 key: 'branch',
                 value: '0555'
+              }
+            ],
+          },
+          response: {
+            type: 'json',
+            check: [
+              {
+                key: "status",
+                value: 200,
+                replace_command: "$.status === {{value}}"
               }
             ],
           }

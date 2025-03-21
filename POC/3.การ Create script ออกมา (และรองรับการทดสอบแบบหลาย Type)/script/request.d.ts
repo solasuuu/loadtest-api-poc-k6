@@ -1,9 +1,9 @@
-export type T_LoadtestApiRequestType = 'load_testing'|'stress_testing'|'performance_testing'
-export type T_LoadtestApiRequestItemType = 'api'|'db'
-export type T_LoadtestApiRequestMethod = 'GET'|'POST'|'PATCH'|'PUT'|'DELETE'
-export type T_LoadtestApiRequestResponseType = 'text'|'json'
-export type T_LoadtestApiRequestAuthType = 'bearer'|'basic'
-export type T_LoadtestApiRequestOptions = { // required[G1+G2, G1+G3, stages]
+export type T_LoadtestApiTypeK6 = 'load_testing'|'stress_testing'|'performance_testing'
+export type T_LoadtestApiItemTypeK6 = 'api'|'db'
+export type T_LoadtestApiMethodK6 = 'GET'|'POST'|'PATCH'|'PUT'|'DELETE'
+export type T_LoadtestApiResponseTypeK6 = 'text'|'json'
+export type T_LoadtestApiAuthTypeK6 = 'bearer'|'basic'
+export type T_LoadtestApiOptionsK6 = { // required[G1+G2, G1+G3, stages]
   vus?: number;  // จำนวนผู้ใช้ที่ต้องการทดสอบ  // [G1] Virtual Users การระบุจำนวน VUs คงที่ตลอดการทดสอบ
   duration?: string;  // ระยะเวลาที่ต้องการทดสอบ เช่น "30s", "2m", "1h"  // [G2] Duration การระบุระยะเวลาที่ต้องการทดสอบร่วมกับจำนวน VUs ([G1+G2])
   iterations?: number;  // จำนวนรอบการทดสอบ  // [G3] Iterations ใช้เมื่อต้องการทดสอบโดยวัดจากจำนวนรอบที่ทำ ไม่ใช่เวลา ([G1+G3])
@@ -47,31 +47,31 @@ export type T_LoadtestApiRequestOptions = { // required[G1+G2, G1+G3, stages]
     [key: string]: string[] | undefined;
   }
 }
-export type T_LoadtestApiRequestBase = {
+export type T_LoadtestApiBaseK6 = {
   key: string;
-  value: string;
+  value: any;
 }
-export type T_LoadtestApiRequestTags = {
+export type T_LoadtestApiTagsK6 = {
   name: string,   
   stage: string,
 }
-export type T_LoadtestApiRequestAuthData= {
-  type: string;  // "string"|"number"
-  key: string;  // "username"|"password"
-  value: string;  // "BM0555.UAT"|"Express@1234"
-}  
-export type T_LoadtestApiRequestAuth = {
-  type: T_LoadtestApiRequestAuthType,
-  data: T_LoadtestApiRequestAuthData[]
+export type T_LoadtestApiAuthK6 = {
+  type: T_LoadtestApiAuthTypeK6,
+  data: (T_LoadtestApiBaseK6 & {
+    type: string; // "string"|"number"|"boolean"
+  })[]
 }
-export type T_LoadtestApiRequestBody = {
+export type T_LoadtestApiBodyK6 = {
   [key: string]: any;
 }
-export type T_LoadtestApiRequestResponseCheck = {
+export type T_LoadtestApiResponseValidateK6 = {
   rule: string;  // "not_null,string"
   ref: string;  // "$.access_token"
 }
-export type T_LoadtestApiRequestSetVariable = {
+export type T_LoadtestApiResponseCheckK6 = T_LoadtestApiBaseK6 & {
+  replace_command: string;  // "$.access_token"  
+}
+export type T_LoadtestApiSetVariableK6 = {
   name: string;  // "token"
   from: keyof Omit<I_LoadtestApiRequestItemBase, 'type'|'set_variable'>;  // "request"|"response"
   ref: string;  // "$.access_token" <- path from response json data
@@ -79,23 +79,23 @@ export type T_LoadtestApiRequestSetVariable = {
 
 
 export interface I_LoadtestApiRequestItemBase {
-  type: T_LoadtestApiRequestItemType,
+  type: T_LoadtestApiItemTypeK6,
   sleep?: number,  // in seconds default 1
-  set_variable?: T_LoadtestApiRequestSetVariable[],
+  set_variable?: T_LoadtestApiSetVariableK6[],
   request: {
-    tags?: T_LoadtestApiRequestTags[],  // "login_page"|"product_page"|"search"
+    tags?: T_LoadtestApiTagsK6[],  // "login_page"|"product_page"|"search"
     timeout?: number,  // in seconds default undefined
     endpoint: string,
-    method: T_LoadtestApiRequestMethod,
-    auth?: T_LoadtestApiRequestAuth,
-    headers?: T_LoadtestApiRequestBase[],
-    params?: T_LoadtestApiRequestBase[]
-    body?: T_LoadtestApiRequestBody,
+    method: T_LoadtestApiMethodK6,
+    auth?: T_LoadtestApiAuthK6,
+    headers?: T_LoadtestApiBaseK6[],
+    params?: T_LoadtestApiBaseK6[]
+    body?: T_LoadtestApiBodyK6,
   },
   response?: {
-    status: number
-    type: T_LoadtestApiRequestResponseType
-    check?: T_LoadtestApiRequestResponseCheck[]
+    type: T_LoadtestApiResponseTypeK6
+    validate?: T_LoadtestApiResponseValidateK6[]
+    check?: T_LoadtestApiResponseCheckK6[]
   },
 }
 
@@ -105,9 +105,9 @@ export interface I_LoadtestApiRequestGroup {
 }
 
 
-export interface T_LoadtestApiRequest {
-  type: T_LoadtestApiRequestType;
-  options: T_LoadtestApiRequestOptions;
+export interface T_LoadtestApiK6 {
+  type: T_LoadtestApiTypeK6;
+  options: T_LoadtestApiOptionsK6;
   precondition?: I_LoadtestApiRequestItemBase[];
   postcondition?: I_LoadtestApiRequestItemBase[];
   items: I_LoadtestApiRequestGroup[]
