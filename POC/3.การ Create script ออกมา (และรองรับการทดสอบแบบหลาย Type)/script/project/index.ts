@@ -55,15 +55,15 @@ export default function () { // parameter สามารถรับมาจ�
 
 
 // ฟังก์ชัน setup ทำงานก่อนการทดสอบเริ่ม
-// export function setup() {
-//   console.log('!! Starting test execution');
-//   return { startTime: new Date().toISOString() };
-// }
+export function setup() {
+  console.log('!! Starting test execution');
+  return { startTime: new Date().toISOString() };
+}
 
 // // ฟังก์ชัน teardown ทำงานหลังจากการทดสอบเสร็จสิ้น (ก่อน handleSummary)
-// export function teardown(data: any) {
-//   console.log(`!! Test execution completed. Started at: ${data.startTime}`);
-// }
+export function teardown(data: any) {
+  console.log(`!! Test execution completed. Started at: ${data.startTime}`);
+}
 
 
 export function handleSummary(data: any) {

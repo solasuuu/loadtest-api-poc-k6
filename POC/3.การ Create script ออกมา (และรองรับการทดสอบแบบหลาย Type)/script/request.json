@@ -1,3 +1,58 @@
 {
-  
+  "type": "load_testing",
+  "precondition": [
+    {
+      "type": "api",
+      "request": {
+        "method": "POST",
+        "endpoint": "https://cj-auth-internal-qa.cjexpress.io/auth/realms/cjexpress/protocol/openid-connect/token",
+        "attribute": {
+          "auth": {},
+          "header": [],
+          "body": {
+            "attribute": {
+              "username": "BM0555.UAT",
+              "password": "Express@1234",
+              "grant_type": "password",
+              "client_id": "web.posback-hq"
+            }
+          }
+        }
+      },
+      "response": {
+        "type": "json",
+        "status": 200,
+        "check": [
+          {
+            "ref": "$.access_token",
+            "rule": "not_null,string"
+          }
+        ]
+      },
+      "set_variable": [
+        {
+          "name": "token",
+          "from": "response",
+          "ref": "$.access_token"
+        }
+      ]
+    }
+  ],
+  "postcondition": [],
+  "step": [
+    {
+      "type": "api",
+      "request": {
+        "method": "GET",
+        "endpoint": "https://posadminapi-automate.cjexpress.io/storm/stock/stock-count?limit=10&page=1&branchCode=0555&startDate=2025-03-07T17:00:00.000Z&endDate=2025-03-21T16:59:59.999Z",
+        "attribute": {
+          "auth": {
+            "type": "bearer",
+            "data": "{{token}}"
+          },
+          "header": []
+        }
+      }
+    }
+  ]
 }
