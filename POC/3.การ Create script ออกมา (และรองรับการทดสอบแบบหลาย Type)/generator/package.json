@@ -1,5 +1,5 @@
 {
-  "name": "script",
+  "name": "generator",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
@@ -7,5 +7,9 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@types/express": "^5.0.1",
+    "express": "^4.21.2"
   }
 }

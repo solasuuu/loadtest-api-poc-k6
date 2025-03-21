@@ -1,4 +1,4 @@
-# script
+# generator
 
 To install dependencies:
 

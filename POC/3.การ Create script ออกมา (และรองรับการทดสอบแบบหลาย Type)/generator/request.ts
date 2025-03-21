@@ -1,4 +1,4 @@
-import type { T_LoadtestApiK6 } from './request.d';
+import { T_LoadtestApiK6 } from './../script/request.d';
 
 export const loadtest_api_request: T_LoadtestApiK6 = {
   type: "load_testing",
