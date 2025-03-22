@@ -8,7 +8,7 @@ export const main = (flow: I_LoadtestApiK6) => {
     export default function () {
       ${flow.items.map((group, group_index) => {
         return `
-          group('${group?.name || `group-${group_index}`}', function () {
+          k6.group('${group?.name || `group-${group_index}`}', function () {
             ${group.steps?.map((step, step_index) => {
               const template = getRequestTemplateFollowMethod({
                 group_index: group_index,

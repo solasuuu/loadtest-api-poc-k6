@@ -5,13 +5,14 @@ import { f } from "../utils/helper";
 type T_Req = T_LoadtestApiKeysReplaceRequestK6
 
 
-export const getRequestHeaderWithReplace = (step: I_LoadtestApiRequestItemBase) => {
+export const getRequestHeaderWithReplace = (step: I_LoadtestApiRequestItemBase, step_use_form_data: boolean|undefined) => {
   const { request } = step
   return f(`
     auth: ${(['basic', 'digest', 'ntlm'] as T_LoadtestApiAuthTypeK6[])?.includes(request?.auth?.type as T_LoadtestApiAuthTypeK6) ? `'${request?.auth?.type}'` : 'undefined'},
     headers: ${request?.headers?.length ? '$headers_obj' as T_Req : 'undefined'},
     cookies: ${request?.cookies?.length ? '$cookies_obj' as T_Req : 'undefined'},
-    body: ${request?.body ? '$body' as T_Req : 'undefined'},
+    ${step_use_form_data ? '' : 
+      `body: ${request?.body ? '$body' as T_Req : 'undefined'}`},
     tags: ${request?.tags?.length ? '$tags_obj' as T_Req : 'undefined'},
     timeout: ${request?.timeout ? '$timeout' as T_Req : 'undefined'},
     jar: ${'undefined'},
@@ -24,7 +25,7 @@ export const getRequestHeaderWithReplace = (step: I_LoadtestApiRequestItemBase) 
 
 
 export const getRequestTemplateFollowMethod = (parame: {
-  group_index: number,
+  group_index?: number,
   step: I_LoadtestApiRequestItemBase, 
   step_index: number
 }) => {
@@ -34,17 +35,23 @@ export const getRequestTemplateFollowMethod = (parame: {
     throw new Error('UNSUPPORTED METHOD')
   }
 
-  const add_on_request = getRequestHeaderWithReplace(step)
+  const step_use_form_data = step?.request?.headers?.some(header => header?.key?.toLowerCase() === 'content-type' && header?.value?.toLowerCase() === 'application/x-www-form-urlencoded')
+  const add_on_request = getRequestHeaderWithReplace(step, step_use_form_data)
   const add_on_request_without_undefined = add_on_request?.split('\n').filter(item => !item.includes('undefined')).join('\n')
   return f(`
-    const req_${group_index}_${step_index} = k6.http.${step?.request?.method?.toLowerCase()}(\`$endpoint$query\`, {
-      ${add_on_request_without_undefined}
-    })
+    const req_${group_index || group_index === 0 ? 
+      `${group_index}_${step_index}` :
+      `${step_index}`
+    } = http.${step?.request?.method?.toLowerCase()}(\`$endpoint$query\`,
+      ${step_use_form_data ? `$form_data,` : ''}
+      {${add_on_request_without_undefined}}
+    )
   `)
 }
 
 
 export const getRequestWithReplaceItems = (step: I_LoadtestApiRequestItemBase): T_LoadtestApiBaseK6<T_LoadtestApiKeysReplaceRequestK6>[] => {
+  const step_use_form_data = step?.request?.headers?.some(header => header?.key?.toLowerCase() === 'content-type' && header?.value?.toLowerCase() === 'application/x-www-form-urlencoded')
   return [
     {
       key: '$endpoint',
@@ -60,21 +67,21 @@ export const getRequestWithReplaceItems = (step: I_LoadtestApiRequestItemBase): 
     },
     {
       key: '$query',
-      value: `?${step?.request?.query?.map(query => `${query.key}=${query.value}`).join('&')}`
+      value: step?.request?.query?.length ? `?${step?.request?.query?.map(query => `${query.key}=${query.value}`).join('&')}` : ''
     },
     {
       key: '$cookies_obj',
       value: step?.request?.cookies?.length ? `{ ${step?.request?.cookies?.map(cookie => `${cookie.key}: '${cookie.value}'`).join(', ')} }` : ''
     },
     {
-      key: '$body',
+      key: step_use_form_data ? '$form_data' : '$body',
       value: step?.request?.body ? f(`{
-        ${
-          (() => {
-            return step?.request?.body ? Object.keys(step?.request?.body ?? {}).map(key => `${key}: '${step?.request?.body?.[key]}'`).join(', ') : ''
-          })()
-        }
-      }`) : ''
+          ${
+            (() => {
+              return step?.request?.body ? Object.keys(step?.request?.body ?? {}).map(key => `'${key}': '${step?.request?.body?.[key]}'`).join(', ') : ''
+            })()
+          }
+        }`) : ''
     },
     {
       key: '$headers_obj',
@@ -83,8 +90,8 @@ export const getRequestWithReplaceItems = (step: I_LoadtestApiRequestItemBase): 
           (() => {
             const bearerRequest = step?.request?.auth?.type?.toLowerCase() === 'bearer'
             return `
-              ${bearerRequest ? `Authorization: 'Bearer ${step?.request?.auth?.data?.[0]?.value}', ` : ''}
-              ${step?.request?.headers?.map(header => `${header.key}: '${header.value}'`).join(', ')}
+              ${bearerRequest ? `'Authorization': 'Bearer ${step?.request?.auth?.data?.[0]?.value}', ` : ''}
+              ${step?.request?.headers?.map(header => `'${header.key}': '${header.value}'`).join(', ')}
               `
           })()
         }

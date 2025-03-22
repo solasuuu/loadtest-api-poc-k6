@@ -15,7 +15,12 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('https://jsonplaceholder.typicode.com/users');
+  const formBody = 'username=BM0555.UAT&password=Express%401234&client_id=web.posback-hq&grant_type=password'
+  const res = http.get('https://jsonplaceholder.typicode.com/users', 
+    {
+      
+    }
+  );
   
   check(res, {
     'status is 200': (r) => r.status === 200,

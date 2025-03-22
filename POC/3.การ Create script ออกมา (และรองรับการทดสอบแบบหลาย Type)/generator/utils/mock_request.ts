@@ -48,8 +48,8 @@ export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
         body: {
           username: "BM0555.UAT",
           password: "Express@1234",
-          grant_type: "password",
-          client_id: "web.posback-hq"
+          client_id: "web.posback-hq",
+          grant_type: "password"
         },
       },
       response: {

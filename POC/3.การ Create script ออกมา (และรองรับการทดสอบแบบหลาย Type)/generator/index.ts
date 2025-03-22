@@ -8,12 +8,14 @@ import { main } from './component/main';
 import { setup } from './component/setup';
 import { teardown } from './component/teardown';
 import { handle } from './component/handle';
+import { option } from './component/option';
 
 
 const mergedScript = async (flow: I_LoadtestApiK6): Promise<string> => {
   const merged = f(`
     ${imports(flow)}
-    $VARIABLE
+    //$VARIABLE
+    ${option(flow)}
     ${handle(flow)}
     ${setup(flow)}
     ${teardown(flow)}

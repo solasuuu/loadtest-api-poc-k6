@@ -3,7 +3,7 @@ export type T_LoadtestApiItemTypeK6 = 'api'|'db'
 export type T_LoadtestApiMethodK6 = 'GET'|'POST'|'PATCH'|'PUT'|'DELETE'
 export type T_LoadtestApiResponseTypeK6 = 'text'|'json'
 export type T_LoadtestApiAuthTypeK6 = 'basic'|'digest'|'ntlm'|'bearer'
-export type T_LoadtestApiKeysReplaceRequestK6 = '$endpoint' | '$body' | '$query' | '$auth_type' | '$headers_obj' | '$tags_obj' | '$timeout' | '$cookies_obj'
+export type T_LoadtestApiKeysReplaceRequestK6 = '$endpoint' | '$body' | '$query' | '$auth_type' | '$headers_obj' | '$tags_obj' | '$timeout' | '$cookies_obj' | '$form_data'
 export type T_LoadtestApiOptionsK6 = { // required[G1+G2, G1+G3, stages]
   vus?: number;  // จำนวนผู้ใช้ที่ต้องการทดสอบ  // [G1] Virtual Users การระบุจำนวน VUs คงที่ตลอดการทดสอบ
   duration?: string;  // ระยะเวลาที่ต้องการทดสอบ เช่น "30s", "2m", "1h"  // [G2] Duration การระบุระยะเวลาที่ต้องการทดสอบร่วมกับจำนวน VUs ([G1+G2])
