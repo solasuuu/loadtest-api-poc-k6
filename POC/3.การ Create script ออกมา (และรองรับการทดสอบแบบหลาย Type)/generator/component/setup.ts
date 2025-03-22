@@ -6,6 +6,7 @@ export const setup = (flow: I_LoadtestApiK6) => {
   return `
     export function setup() {
       console.log('[Setup]: Starting test execution');
+      
     }
   `
 }

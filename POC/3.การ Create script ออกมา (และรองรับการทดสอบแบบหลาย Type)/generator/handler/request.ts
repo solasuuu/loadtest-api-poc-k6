@@ -37,7 +37,7 @@ export const getRequestTemplateFollowMethod = (parame: {
   const add_on_request = getRequestHeaderWithReplace(step)
   const add_on_request_without_undefined = add_on_request?.split('\n').filter(item => !item.includes('undefined')).join('\n')
   return f(`
-    const req_${group_index}_${step_index} = http.${step?.request?.method?.toLowerCase()}(\`$endpoint$query\`, {
+    const req_${group_index}_${step_index} = k6.http.${step?.request?.method?.toLowerCase()}(\`$endpoint$query\`, {
       ${add_on_request_without_undefined}
     })
   `)
