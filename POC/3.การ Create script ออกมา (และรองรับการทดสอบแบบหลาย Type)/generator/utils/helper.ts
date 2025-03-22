@@ -1,0 +1,1 @@
+export const f = (s: string) => s?.split('\n')?.map((x) => x.replace('  ', ''))?.join('\n') ?? ''

@@ -1,8 +1,30 @@
-import { T_LoadtestApiK6 } from './../script/request.d';
+import type { I_LoadtestApiK6 } from '../types/request';
 
-export const loadtest_api_request: T_LoadtestApiK6 = {
+export const mockOptionStage: {
+  [key: string]: I_LoadtestApiK6['options']['stages']
+} = {
+  load_testing: [
+    { duration: '1m', target: 100 },
+    { duration: '2m', target: 100 },
+    { duration: '1m', target: 0 },
+  ],
+  stress_testing: [
+    { duration: '2m', target: 100 },
+    { duration: '3m', target: 200 },
+    { duration: '1m', target: 0 },
+  ],
+  performance_testing: [
+    { duration: '2m', target: 100 },
+    { duration: '3m', target: 200 },
+    { duration: '1m', target: 0 },
+  ],
+}
+
+
+export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
   type: "load_testing",
   options: {
+    stages: mockOptionStage?.load_testing,
     thresholds: {
       http_req_failed: ['rate<0.15'], // อนุญาตให้มีอัตราข้อผิดพลาดที่สูงขึ้นในช่วงการเพิ่มโหลดแบบกะทันหัน
       http_req_duration: [

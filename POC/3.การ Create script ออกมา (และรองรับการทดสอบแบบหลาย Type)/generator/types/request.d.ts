@@ -105,7 +105,7 @@ export interface I_LoadtestApiRequestGroup {
 }
 
 
-export interface T_LoadtestApiK6 {
+export interface I_LoadtestApiK6 {
   type: T_LoadtestApiTypeK6;
   options: T_LoadtestApiOptionsK6;
   precondition?: I_LoadtestApiRequestItemBase[];
