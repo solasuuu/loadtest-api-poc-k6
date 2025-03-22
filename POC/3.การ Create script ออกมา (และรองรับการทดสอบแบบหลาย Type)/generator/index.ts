@@ -1,38 +1,44 @@
 import fs from 'fs-extra'
 import _express from "express";
 import type { I_LoadtestApiK6 } from "./types/request";
-import { mockLoadtestApiRequest } from "./utils/mock";
+import { mockLoadtestApiRequest } from "./utils/mock_request";
 import { copyFolder, f } from "./utils/helper";
 import { imports } from './component/import';
-import { core } from './component/core';
+import { main } from './component/main';
 import { setup } from './component/setup';
 import { teardown } from './component/teardown';
 import { handle } from './component/handle';
 
+
 const mergedScript = async (flow: I_LoadtestApiK6): Promise<string> => {
-  return f(`
+  const merged = f(`
     ${imports(flow)}
+    $VARIABLE
     ${handle(flow)}
     ${setup(flow)}
     ${teardown(flow)}
-    ${core(flow)}
+    ${main(flow)}
   `)
+  return merged 
 }
+
 
 // func generate script follow loadtest types
 const generateLoadtestingScript = async (flow: I_LoadtestApiK6) => {
-  const dir = './../script';
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, {
+  const source_dir = './ready-made/script';
+  const destination_dir = './../script';
+  if (!fs.existsSync(destination_dir)) {
+    fs.mkdirSync(destination_dir, {
       recursive: true
     });
   }
-  await fs.writeFile(`${dir}/index.js`, (await mergedScript(flow))?.trim());
-  await copyFolder('./ready-made/script', './../script');
+  await copyFolder(source_dir, destination_dir);
+  await fs.writeFile(`${destination_dir}/index.js`, (await mergedScript(flow))?.trim());
   console.info('[INFO]: Script generated successfully');
 }
 
-// Core   
+
+// main function   
 const flow = mockLoadtestApiRequest as I_LoadtestApiK6
 switch (flow?.type) {
   case 'load_testing':

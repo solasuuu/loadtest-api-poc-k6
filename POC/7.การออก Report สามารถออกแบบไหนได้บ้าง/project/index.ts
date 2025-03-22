@@ -42,7 +42,18 @@ export const options = {
 };
 
 export default function () { // parameter สามารถรับมาจาก setup ได้
-  const res = http.get('https://jsonplaceholder.typicode.com/users');
+  const res = http.get('https://jsonplaceholder.typicode.com/users', {
+    auth: undefined,
+    headers: undefined,
+    compression: undefined,
+    cookies: undefined,
+    jar: undefined,
+    redirects: undefined,
+    responseCallback: undefined,
+    responseType: undefined,
+    timeout: undefined,
+    tags: { name: 'login', },
+  });
 
   check(res, {
     'status is 200': (r) => r.status === 200,

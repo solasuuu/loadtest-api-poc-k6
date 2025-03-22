@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@types/glob": "^8.1.0",
+    "@types/js-beautify": "^1.14.3",
     "express": "^4.21.2",
     "fs-extra": "^11.3.0",
     "glob": "^11.0.1",
-    "ignore": "^7.0.3"
+    "ignore": "^7.0.3",
+    "js-beautify": "^1.15.4"
   }
 }

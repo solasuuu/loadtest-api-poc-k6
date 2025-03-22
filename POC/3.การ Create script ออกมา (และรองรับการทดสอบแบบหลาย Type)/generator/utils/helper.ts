@@ -1,6 +1,7 @@
 import fs from 'fs-extra'
+import beautify from 'js-beautify';
 
-export const f = (s: string) => s?.split('\n')?.map((x) => x.replace('  ', ''))?.join('\n') ?? ''
+export const f = (s: string) => beautify.js(s, { indent_size: 2, preserve_newlines: false })?.toString()?.toString()?.replace(/export/g, '\nexport')
 
 export const copyFolder = async (source_dir: string, destination_dir: string) => {
   try {

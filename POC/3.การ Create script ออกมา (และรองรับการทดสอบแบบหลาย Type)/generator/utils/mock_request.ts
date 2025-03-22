@@ -79,13 +79,35 @@ export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
           type: "api",
           request: {
             method: "GET",
-            endpoint: "https://posadminapi-automate.cjexpress.io/storm/stock/stock-count?limit=10&page=1&branchCode=0555&startDate=2025-03-07T17:00:00.000Z&endDate=2025-03-21T16:59:59.999Z",
+            endpoint: "https://posadminapi-automate.cjexpress.io/storm/stock/stock-count",
+            query: [
+              {
+                key: "limit",
+                value: "10"
+              },
+              {
+                key: "page",
+                value: "1"
+              },
+              {
+                key: "branchCode",
+                value: "0555"
+              },
+              {
+                key: "startDate",
+                value: "2025-03-07T17:00:00.000Z"
+              },
+              {
+                key: "endDate",
+                value: "2025-03-21T16:59:59.999Z"
+              }
+            ],
             auth: {
               type: "bearer",
               data: [
                 {
                   key: "",
-                  value: "{{token}}",
+                  value: "$token",
                   type: "string"
                 }
               ]

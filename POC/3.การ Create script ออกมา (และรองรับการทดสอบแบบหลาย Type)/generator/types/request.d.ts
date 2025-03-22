@@ -2,7 +2,8 @@ export type T_LoadtestApiTypeK6 = 'load_testing'|'stress_testing'|'performance_t
 export type T_LoadtestApiItemTypeK6 = 'api'|'db'
 export type T_LoadtestApiMethodK6 = 'GET'|'POST'|'PATCH'|'PUT'|'DELETE'
 export type T_LoadtestApiResponseTypeK6 = 'text'|'json'
-export type T_LoadtestApiAuthTypeK6 = 'bearer'|'basic'
+export type T_LoadtestApiAuthTypeK6 = 'basic'|'digest'|'ntlm'|'bearer'
+export type T_LoadtestApiKeysReplaceRequestK6 = '$endpoint' | '$body' | '$query' | '$auth_type' | '$headers_obj' | '$tags_obj' | '$timeout' | '$cookies_obj'
 export type T_LoadtestApiOptionsK6 = { // required[G1+G2, G1+G3, stages]
   vus?: number;  // จำนวนผู้ใช้ที่ต้องการทดสอบ  // [G1] Virtual Users การระบุจำนวน VUs คงที่ตลอดการทดสอบ
   duration?: string;  // ระยะเวลาที่ต้องการทดสอบ เช่น "30s", "2m", "1h"  // [G2] Duration การระบุระยะเวลาที่ต้องการทดสอบร่วมกับจำนวน VUs ([G1+G2])
@@ -47,13 +48,12 @@ export type T_LoadtestApiOptionsK6 = { // required[G1+G2, G1+G3, stages]
     [key: string]: string[] | undefined;
   }
 }
-export type T_LoadtestApiBaseK6 = {
-  key: string;
+export type T_LoadtestApiBaseK6<T_Keys = string> = {
+  key: T_Keys;
   value: any;
 }
 export type T_LoadtestApiTagsK6 = {
-  name: string,   
-  stage: string,
+  name: string
 }
 export type T_LoadtestApiAuthK6 = {
   type: T_LoadtestApiAuthTypeK6,
@@ -89,7 +89,9 @@ export interface I_LoadtestApiRequestItemBase {
     method: T_LoadtestApiMethodK6,
     auth?: T_LoadtestApiAuthK6,
     headers?: T_LoadtestApiBaseK6[],
-    params?: T_LoadtestApiBaseK6[]
+    cookies?: T_LoadtestApiBaseK6[],
+    params?: T_LoadtestApiBaseK6[] // need :key in url for replace eg. /api/v1/user/:id <- {key: 'id', value: 1}
+    query?: T_LoadtestApiBaseK6[]
     body?: T_LoadtestApiBodyK6,
   },
   response?: {
