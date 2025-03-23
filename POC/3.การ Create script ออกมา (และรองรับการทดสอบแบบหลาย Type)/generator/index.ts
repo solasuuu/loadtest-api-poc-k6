@@ -9,20 +9,22 @@ import { setup } from './component/setup';
 import { teardown } from './component/teardown';
 import { handle } from './component/handle';
 import { option } from './component/option';
-import { configs } from './config';
+import { replaceUseVariable } from './handler/variable';
 
 
 const mergedScript = async (flow: I_LoadtestApiK6): Promise<string> => {
-  const merged = f(`
+  const full_script = f(`
     ${imports(flow)}
-    var ${configs?.global_variable_name} = {}
     ${option(flow)}
     ${handle(flow)}
     ${setup(flow)}
     ${teardown(flow)}
     ${main(flow)}
   `)
-  return merged 
+
+  const full_script_with_replace_variables = replaceUseVariable(full_script)
+  console.log('full_script_with_replace_variables', full_script_with_replace_variables)
+  return full_script_with_replace_variables
 }
 
 

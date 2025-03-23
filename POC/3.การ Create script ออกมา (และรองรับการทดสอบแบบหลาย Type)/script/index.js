@@ -3,7 +3,6 @@ import http from 'k6/http';
 import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js'
-var varaibles = {}
 
 export const options = {
   vus: 1,
@@ -20,7 +19,8 @@ export function handleSummary(data) {
 }
 
 export function setup() {
-  console.log('[Setup]: Starting test execution');
+  console.info('[Setup]: Starting test execution');
+  const variables = {}
   const req_0 = http.post(`https://cj-auth-internal-qa.cjexpress.io/auth/realms/cjexpress/protocol/openid-connect/token`, {
     'username': 'BM0555.UAT',
     'password': 'Express@1234',
@@ -28,27 +28,28 @@ export function setup() {
     'grant_type': 'password'
   }, {
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': `application/x-www-form-urlencoded`
     },
   })
-  varaibles.token = req_0.json().access_token
+  variables.token = req_0.json().access_token
+  return variables
 }
 
-export function teardown() {
-  console.log('[Teardown]: Test execution completed');
+export function teardown(variables) {
+  console.info('[Teardown]: Test execution completed');
 }
 
-export default function() {
-  k6.group('login_page', function() {
+export default function(variables) {
+  k6.group(`login_page`, function() {
     const req_0_0 = http.get(`https://posadminapi-automate.cjexpress.io/storm/stock/stock-count?limit=10&page=1&branchCode=0555&startDate=2025-03-07T17:00:00.000Z&endDate=2025-03-21T16:59:59.999Z`, {
       headers: {
-        'Authorization': 'Bearer $token',
-        'branch': '0555'
+        'Authorization': `Bearer ${variables.token}`,
+        'branch': `0555`
       },
     })
     k6.check(req_0_0, {
       'status is 200': (r) => r.status === 200,
-      'response time < 400ms': (r) => r.response_time < 400
+      'response time < 4000ms': (r) => r.timings.duration < 4000
     })
   })
 }

@@ -95,8 +95,8 @@ export const getRequestWithReplaceItems = (step: I_LoadtestApiRequestItemBase): 
           (() => {
             const bearerRequest = step?.request?.auth?.type?.toLowerCase() === 'bearer'
             return `
-              ${bearerRequest ? `'Authorization': 'Bearer ${step?.request?.auth?.data?.[0]?.value}', ` : ''}
-              ${step?.request?.headers?.map(header => `'${header.key}': '${header.value}'`).join(', ')}
+              ${bearerRequest ? `'Authorization': \`Bearer ${step?.request?.auth?.data?.[0]?.value}\`, ` : ''}
+              ${step?.request?.headers?.map(header => `'${header.key}': \`${header.value}\``).join(', ')}
               `
           })()
         }

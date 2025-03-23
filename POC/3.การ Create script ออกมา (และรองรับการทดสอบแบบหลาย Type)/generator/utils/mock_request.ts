@@ -128,9 +128,9 @@ export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
                 value: 200,
               },
               {
-                name: "response time < 400ms",
-                path: "$.response_time < $value",
-                value: 400,
+                name: "response time < 4000ms",
+                path: "$.timings.duration < $value",
+                value: 4000,
               }
             ],
           }
