@@ -1,8 +1,0 @@
-services:
-  k6:
-    image: grafana/k6
-    environment:
-      - K6_WEB_DASHBOARD=true
-      - K6_WEB_DASHBOARD_EXPORT=/k6-script/report.html
-    volumes:
-      - .:/k6-script
