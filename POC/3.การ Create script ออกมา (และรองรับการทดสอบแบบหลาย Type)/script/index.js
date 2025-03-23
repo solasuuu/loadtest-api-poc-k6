@@ -5,9 +5,20 @@ import {
 } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js'
 
 export const options = {
-  vus: 1,
-  duration: '1s'
-};
+  "stages": [{
+    "duration": "1s",
+    "target": 1
+  }, {
+    "duration": "2s",
+    "target": 2
+  }, {
+    "duration": "1s",
+    "target": 0
+  }],
+  "thresholds": {
+    "http_req_duration": ["p(95)<500"]
+  }
+}
 
 export function handleSummary(data) {
   return {
