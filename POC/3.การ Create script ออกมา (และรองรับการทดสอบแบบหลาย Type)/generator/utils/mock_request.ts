@@ -1,38 +1,77 @@
 import type { I_LoadtestApiK6 } from '../types/request';
 
 export const mockOptionStage: {
-  [key: string]: I_LoadtestApiK6['options']['stages']
+  [key: string]: I_LoadtestApiK6['options']
 } = {
-  load_testing: [
-    { duration: '1m', target: 100 },
-    { duration: '2m', target: 100 },
-    { duration: '1m', target: 0 },
-  ],
-  stress_testing: [
-    { duration: '2m', target: 100 },
-    { duration: '3m', target: 200 },
-    { duration: '1m', target: 0 },
-  ],
-  performance_testing: [
-    { duration: '2m', target: 100 },
-    { duration: '3m', target: 200 },
-    { duration: '1m', target: 0 },
-  ],
+  load_testing: {
+    stages: [
+      { duration: '2m', target: 100 }, // เพิ่มผู้ใช้เป็น 100 คนในเวลา 2 นาที
+      { duration: '5m', target: 100 }, // คงจำนวนผู้ใช้ที่ 100 คนเป็นเวลา 5 นาที
+      { duration: '2m', target: 0 },   // ลดจำนวนผู้ใช้เป็น 0 คน
+    ],
+    thresholds: {
+      http_req_duration: ['p95<500'], // 95% ของการร้องขอต้องเสร็จสิ้นภายใน 500 มิลลิวินาที
+      'http_req_duration{staticAsset:yes}': ['p95<100'], // 95% ของการร้องขอไฟล์สถิตต้องเสร็จสิ้นภายใน 100 มิลลิวินาที
+    }
+  },
+  stress_testing: {
+    stages: [
+      { duration: '2m', target: 100 },   // โหลดปกติ
+      { duration: '5m', target: 1000 },  // เพิ่มไปถึงระดับความเครียด (10x ของปกติ)
+      { duration: '2m', target: 2000 },  // ความเครียดสูงสุด
+      { duration: '5m', target: 0 },     // ช่วงการฟื้นตัว
+    ],
+    thresholds: {
+      http_req_duration: ['p95<2000'], // เกณฑ์ที่ผ่อนปรนกว่าสำหรับการทดสอบความเครียด
+      http_req_failed: ['rate<0.1'],   // อัตราความผิดพลาดน้อยกว่า 10%
+    }
+  },
+  endurance_testing_soak: {
+    stages: [
+      { duration: '10m', target: 100 },  // ช่วงเพิ่มจำนวนผู้ใช้
+      { duration: '8h', target: 100 },   // คงจำนวนผู้ใช้ไว้ที่เป้าหมายเป็นเวลา 8 ชั่วโมง
+      { duration: '10m', target: 0 },    // ช่วงลดจำนวนผู้ใช้
+    ],
+    thresholds: {
+      http_req_duration: ['p95<500'],
+      http_req_failed: ['rate<0.01'],
+    }
+  },
+  spike_testing: {
+    stages: [
+      { duration: '1m', target: 50 },    // โหลดปกติ
+      { duration: '10s', target: 1000 }, // เพิ่มเป็น 1000 ผู้ใช้ในเวลาเพียง 10 วินาที
+      { duration: '3m', target: 1000 },  // คงที่ที่ระดับสูงสุด
+      { duration: '1m', target: 50 },    // ลดกลับสู่ระดับปกติ
+      { duration: '3m', target: 50 },    // โหลดปกติอีกครั้งเพื่อดูการฟื้นตัว
+    ],
+    thresholds: {
+      http_req_failed: ['rate<0.15'], // อนุญาตให้มีอัตราข้อผิดพลาดที่สูงขึ้นในช่วงการเพิ่มโหลดแบบกะทันหัน
+    }
+  },
+  scalability_testing: {
+    stages: [
+      { duration: '3m', target: 100 },   // ระดับที่ 1
+      { duration: '5m', target: 100 },
+      { duration: '3m', target: 200 },   // ระดับที่ 2
+      { duration: '5m', target: 200 },
+      { duration: '3m', target: 300 },   // ระดับที่ 3
+      { duration: '5m', target: 300 },
+      { duration: '3m', target: 400 },   // ระดับที่ 4
+      { duration: '5m', target: 400 },
+      { duration: '3m', target: 0 },     // ช่วงลดจำนวนผู้ใช้
+    ],
+    thresholds: {
+      http_req_duration: ['p95<500'],
+      http_req_failed: ['rate<0.01'],
+    }
+  }
 }
 
 
 export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
   type: "load_testing",
-  options: {
-    stages: mockOptionStage?.load_testing,
-    thresholds: {
-      http_req_failed: ['rate<0.15'], // อนุญาตให้มีอัตราข้อผิดพลาดที่สูงขึ้นในช่วงการเพิ่มโหลดแบบกะทันหัน
-      http_req_duration: [
-        'p(95)<500', // 95% ของ requests ต้องเร็วกว่า 500ms
-        'p(99)<1000', // 99% ของ requests ต้องเร็วกว่า 1000ms
-      ] 
-    }
-  },
+  options: mockOptionStage?.load_testing,
   precondition: [
     {
       type: "api",
@@ -133,7 +172,14 @@ export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
                 value: 4000,
               }
             ],
-          }
+          },
+          // set_variable: [
+          //   {
+          //     name: "user_id",
+          //     from: "response",
+          //     path: "$.json().user_id"
+          //   }
+          // ],
         }
       ]
     }
