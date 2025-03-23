@@ -4,7 +4,8 @@
   "type": "module",
   "devDependencies": {
     "@types/express": "^5.0.1",
-    "@types/fs-extra": "^11.0.4"
+    "@types/fs-extra": "^11.0.4",
+    "@types/tar-fs": "^2.0.4"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -16,6 +17,7 @@
     "fs-extra": "^11.3.0",
     "glob": "^11.0.1",
     "ignore": "^7.0.3",
-    "js-beautify": "^1.15.4"
+    "js-beautify": "^1.15.4",
+    "tar-fs": "^3.0.8"
   }
 }

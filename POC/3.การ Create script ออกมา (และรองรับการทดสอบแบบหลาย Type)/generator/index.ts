@@ -2,7 +2,7 @@ import fs from 'fs-extra'
 import _express from "express";
 import type { I_LoadtestApiK6 } from "./types/request";
 import { mockLoadtestApiRequest } from "./utils/mock_request";
-import { compressAndSaveToGzip, compressDirectoryToGzip, copyFolder, f } from "./utils/helper";
+import { compressFolderToGzip, copyFolder, f } from "./utils/helper";
 import { imports } from './component/import';
 import { main } from './component/main';
 import { setup } from './component/setup';
@@ -39,7 +39,8 @@ const generateLoadtestingScript = async (flow: I_LoadtestApiK6) => {
   }
   await copyFolder(source_dir, destination_dir);
   await fs.writeFile(`${destination_dir}/index.js`, (await mergedScript(flow))?.trim());
-  await compressDirectoryToGzip(destination_dir, destination_dir);
+  await compressFolderToGzip(destination_dir, destination_dir);
+  
   console.info('[INFO]: Script generated successfully');
 }
 
