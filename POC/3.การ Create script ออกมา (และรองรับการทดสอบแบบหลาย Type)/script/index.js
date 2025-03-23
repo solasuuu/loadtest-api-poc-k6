@@ -3,7 +3,7 @@ import http from 'k6/http';
 import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js'
-//$VARIABLE
+var varaibles = {}
 
 export const options = {
   vus: 1,
@@ -31,19 +31,24 @@ export function setup() {
       'Content-Type': 'application/x-www-form-urlencoded'
     },
   })
+  varaibles.token = req_0.json().access_token
+}
 
-  k6.check(req_0, {
-    'status is 200': (r) => r.status === 200,
-  });
+export function teardown() {
+  console.log('[Teardown]: Test execution completed');
 }
 
 export default function() {
-  // k6.group('login_page', function() {
-  //   const req_0_0 = http.get(`https://posadminapi-automate.cjexpress.io/storm/stock/stock-count?limit=10&page=1&branchCode=0555&startDate=2025-03-07T17:00:00.000Z&endDate=2025-03-21T16:59:59.999Z`, {
-  //     headers: {
-  //       'Authorization': 'Bearer $token',
-  //       'branch': '0555'
-  //     },
-  //   })
-  // })
+  k6.group('login_page', function() {
+    const req_0_0 = http.get(`https://posadminapi-automate.cjexpress.io/storm/stock/stock-count?limit=10&page=1&branchCode=0555&startDate=2025-03-07T17:00:00.000Z&endDate=2025-03-21T16:59:59.999Z`, {
+      headers: {
+        'Authorization': 'Bearer $token',
+        'branch': '0555'
+      },
+    })
+    k6.check(req_0_0, {
+      'status is 200': (r) => r.status === 200,
+      'response time < 400ms': (r) => r.response_time < 400
+    })
+  })
 }

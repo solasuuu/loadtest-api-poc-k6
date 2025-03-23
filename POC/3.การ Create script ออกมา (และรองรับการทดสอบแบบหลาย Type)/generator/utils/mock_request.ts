@@ -65,7 +65,7 @@ export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
         {
           name: "token",
           from: "response",
-          ref: "$.access_token"
+          path: "$.json().access_token"
         }
       ],
     }
@@ -123,9 +123,14 @@ export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
             type: 'json',
             check: [
               {
-                key: "status",
+                name: "status is 200",
+                path: "$.status === $value",
                 value: 200,
-                replace_command: "$.status === {{value}}"
+              },
+              {
+                name: "response time < 400ms",
+                path: "$.response_time < $value",
+                value: 400,
               }
             ],
           }

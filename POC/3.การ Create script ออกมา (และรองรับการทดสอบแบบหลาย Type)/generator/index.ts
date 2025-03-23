@@ -9,12 +9,13 @@ import { setup } from './component/setup';
 import { teardown } from './component/teardown';
 import { handle } from './component/handle';
 import { option } from './component/option';
+import { configs } from './config';
 
 
 const mergedScript = async (flow: I_LoadtestApiK6): Promise<string> => {
   const merged = f(`
     ${imports(flow)}
-    //$VARIABLE
+    var ${configs?.global_variable_name} = {}
     ${option(flow)}
     ${handle(flow)}
     ${setup(flow)}

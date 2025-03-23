@@ -4,8 +4,6 @@ import { f } from "../utils/helper"
 
 export const setup = (flow: I_LoadtestApiK6) => {
   const { precondition } = flow
-  if (!precondition?.length) return ''
-
   return f(`
     export function setup() {
       console.log('[Setup]: Starting test execution');

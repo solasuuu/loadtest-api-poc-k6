@@ -68,13 +68,15 @@ export type T_LoadtestApiResponseValidateK6 = {
   rule: string;  // "not_null,string"
   ref: string;  // "$.access_token"
 }
-export type T_LoadtestApiResponseCheckK6 = T_LoadtestApiBaseK6 & {
-  replace_command: string;  // "$.access_token"  
+export type T_LoadtestApiResponseCheckK6 = {
+  name?: string; 
+  path: string;  // "$.access_token"
+  value: any;
 }
 export type T_LoadtestApiSetVariableK6 = {
   name: string;  // "token"
   from: keyof Omit<I_LoadtestApiRequestItemBase, 'type'|'set_variable'>;  // "request"|"response"
-  ref: string;  // "$.access_token" <- path from response json data
+  path: string;  // "$.access_token" <- path from response json data
 }
 
 

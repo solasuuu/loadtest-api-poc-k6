@@ -1,5 +1,7 @@
 import type { I_LoadtestApiRequestItemBase, T_LoadtestApiAuthTypeK6, T_LoadtestApiBaseK6, T_LoadtestApiKeysReplaceRequestK6, T_LoadtestApiMethodK6 } from "../types/request";
 import { f } from "../utils/helper";
+import { getResponseCheck } from "./response";
+import { setVariable } from "./variable";
 
 // shorthand
 type T_Req = T_LoadtestApiKeysReplaceRequestK6
@@ -7,6 +9,7 @@ type T_Req = T_LoadtestApiKeysReplaceRequestK6
 
 export const getRequestHeaderWithReplace = (step: I_LoadtestApiRequestItemBase, step_use_form_data: boolean|undefined) => {
   const { request } = step
+
   return f(`
     auth: ${(['basic', 'digest', 'ntlm'] as T_LoadtestApiAuthTypeK6[])?.includes(request?.auth?.type as T_LoadtestApiAuthTypeK6) ? `'${request?.auth?.type}'` : 'undefined'},
     headers: ${request?.headers?.length ? '$headers_obj' as T_Req : 'undefined'},
@@ -38,14 +41,16 @@ export const getRequestTemplateFollowMethod = (parame: {
   const step_use_form_data = step?.request?.headers?.some(header => header?.key?.toLowerCase() === 'content-type' && header?.value?.toLowerCase() === 'application/x-www-form-urlencoded')
   const add_on_request = getRequestHeaderWithReplace(step, step_use_form_data)
   const add_on_request_without_undefined = add_on_request?.split('\n').filter(item => !item.includes('undefined')).join('\n')
+
+  const req_var = `req_${group_index || group_index === 0 ? `${group_index}_${step_index}` : `${step_index}`}`
+
   return f(`
-    const req_${group_index || group_index === 0 ? 
-      `${group_index}_${step_index}` :
-      `${step_index}`
-    } = http.${step?.request?.method?.toLowerCase()}(\`$endpoint$query\`,
+    ${step?.response?.check?.length || step?.set_variable?.length ? `const ${req_var} = ` : ''}http.${step?.request?.method?.toLowerCase()}(\`$endpoint$query\`,
       ${step_use_form_data ? `$form_data,` : ''}
       {${add_on_request_without_undefined}}
     )
+    ${getResponseCheck(step, req_var)}
+    ${setVariable(step, req_var)}
   `)
 }
 
