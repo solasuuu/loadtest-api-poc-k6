@@ -6,7 +6,9 @@ export const globals: {
     path?: string
     from?: string
   }[]
+  docker_dir: string
 } = {
   variable_name: 'variables',
-  variables: []
+  variables: [],
+  docker_dir: '/k6-script',
 }

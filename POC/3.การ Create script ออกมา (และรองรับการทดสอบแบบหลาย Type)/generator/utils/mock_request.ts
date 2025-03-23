@@ -144,7 +144,7 @@ export const mockOptionStage: {
 
 export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
   type: "load_testing",
-  options: mockOptionStage.debug,
+  options: mockOptionStage.scalability_testing,
   precondition: [
     {
       type: "api",
@@ -240,9 +240,9 @@ export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
                 value: 200,
               },
               {
-                name: "response time < 4000ms",
+                name: "response time < 800ms",
                 path: "$.timings.duration < $value",
-                value: 4000,
+                value: 800,
               }
             ],
           },

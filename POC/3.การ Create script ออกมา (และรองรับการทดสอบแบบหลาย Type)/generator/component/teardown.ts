@@ -6,7 +6,7 @@ export const teardown = (flow: I_LoadtestApiK6) => {
   const { postcondition } = flow
   return f(`
     export function teardown(${globals.variable_name}) {
-      console.info('[Teardown]: Test execution completed');
+      console.info('[Teardown]: Test execution completed')
     }
   `)
 }

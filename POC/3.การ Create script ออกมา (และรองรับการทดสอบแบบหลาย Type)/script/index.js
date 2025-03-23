@@ -1,36 +1,56 @@
-import k6 from 'k6';
-import http from 'k6/http';
+import k6 from 'k6'
+import http from 'k6/http'
 import {
   textSummary
 } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js'
 
 export const options = {
   "stages": [{
-    "duration": "1s",
+    "duration": "3s",
     "target": 1
   }, {
-    "duration": "2s",
+    "duration": "5s",
+    "target": 1
+  }, {
+    "duration": "3s",
     "target": 2
   }, {
-    "duration": "1s",
+    "duration": "5s",
+    "target": 2
+  }, {
+    "duration": "3s",
+    "target": 3
+  }, {
+    "duration": "5s",
+    "target": 3
+  }, {
+    "duration": "3s",
+    "target": 4
+  }, {
+    "duration": "5s",
+    "target": 4
+  }, {
+    "duration": "3s",
     "target": 0
   }],
   "thresholds": {
-    "http_req_duration": ["p(95)<500"]
+    "http_req_duration": ["p(95)<500"],
+    "http_req_failed": ["rate<0.01"]
   }
 }
 
 export function handleSummary(data) {
   return {
+    '/k6-script/summary.json': JSON.stringify(data),
     'stdout': textSummary(data, {
       indent: ' ',
       enableColors: true
     })
-  };
+  }
 }
 
 export function setup() {
-  console.info('[Setup]: Starting test execution');
+  console.info('[Setup]: Starting test execution')
   const variables = {}
   const req_0 = http.post(`https://cj-auth-internal-qa.cjexpress.io/auth/realms/cjexpress/protocol/openid-connect/token`, {
     'username': 'BM0555.UAT',
@@ -47,7 +67,7 @@ export function setup() {
 }
 
 export function teardown(variables) {
-  console.info('[Teardown]: Test execution completed');
+  console.info('[Teardown]: Test execution completed')
 }
 
 export default function(variables) {
@@ -60,7 +80,7 @@ export default function(variables) {
     })
     k6.check(req_0_0, {
       'status is 200': (r) => r.status === 200,
-      'response time < 4000ms': (r) => r.timings.duration < 4000
+      'response time < 800ms': (r) => r.timings.duration < 800
     })
   })
 }

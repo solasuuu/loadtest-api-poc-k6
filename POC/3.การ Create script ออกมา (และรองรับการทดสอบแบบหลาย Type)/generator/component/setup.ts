@@ -7,7 +7,7 @@ export const setup = (flow: I_LoadtestApiK6) => {
   const { precondition } = flow
   return f(`
     export function setup() {
-      console.info('[Setup]: Starting test execution');
+      console.info('[Setup]: Starting test execution')
       const ${globals?.variable_name} = {}
       ${
         precondition?.map((step, index) => {
