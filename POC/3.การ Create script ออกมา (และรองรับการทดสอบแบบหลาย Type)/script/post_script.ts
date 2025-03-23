@@ -1,50 +1,86 @@
-import { gzip } from 'zlib'
+import { gzip } from 'zlib';
 import { promisify } from 'util';
-const gzipPromise = promisify(gzip)
+const gzipPromise = promisify(gzip);
 
-
-const test_summary: any = {
-  file: null,
-  content: null
+interface FileData {
+  file: any;
+  content: any;
 }
 
-const test_detail: any = {
-  file: null,
-  content: null
+async function readJsonFile(filePath: string, isArray: boolean = false): Promise<FileData> {
+  const fileData: FileData = { file: null, content: null };
+  
+  try {
+    fileData.file = Bun.file(filePath);
+    let textContent = await fileData.file.text();
+    
+    if (isArray) {
+      // Format non-standard JSON to valid JSON array
+      if (!textContent.trim().startsWith('[')) {
+        // Replace any trailing comma after the last object (if exists)
+        textContent = textContent.replace(/,\s*$/, '');
+        // Wrap individual JSON objects in array brackets
+        textContent = '[' + textContent.replace(/}\s*{/g, '},{') + ']';
+      }
+    }
+    
+    fileData.content = JSON.parse(textContent);
+  } catch (error) {
+    console.error(`Error processing ${filePath}:`, error);
+    fileData.content = isArray ? [] : {};
+  }
+  
+  return fileData;
 }
 
-test_summary.file = Bun.file('summary.json');
-test_summary.content = JSON.parse(await test_summary?.file?.text());
-
-test_detail.file = Bun.file('result.json');
-const make_valid_json = await test_detail?.file?.text();
-
-// Convert the non-standard JSON format to a valid JSON array
-let validJsonString = make_valid_json;
-// First, check if it's already a valid JSON array
-if (!validJsonString.trim().startsWith('[')) {
-  // Replace any trailing comma after the last object (if exists)
-  validJsonString = validJsonString.replace(/,\s*$/, '');
-  // Wrap individual JSON objects in array brackets
-  validJsonString = '[' + validJsonString.replace(/}\s*{/g, '},{') + ']';
+async function compressAndSave(data: any, outputPath: string): Promise<void> {
+  try {
+    const gzipBuffer = await gzipPromise(typeof data === 'string' ? data : JSON.stringify(data));
+    const outputFile = Bun.file(outputPath);
+    await outputFile.write(gzipBuffer);
+    console.info(`[INFO]: Created ${outputPath} successfully`);
+  } catch (error) {
+    console.error(`[ERROR]: Failed to create ${outputPath}:`, error);
+  }
 }
 
-try {
-  test_detail.content = JSON.parse(validJsonString);
-} catch (error) {
-  console.error('Error parsing JSON:', error);
-  test_detail.content = []; // Default to empty array if parsing fails
+async function main() {
+  // Run file processing tasks concurrently
+  const [testSummary, testDetail, reportHtml] = await Promise.all([
+    readJsonFile('./summary.json'),
+    readJsonFile('./result.json', true),
+    readTextFile('./report.html')
+  ]);
+  
+  // Prepare merged report
+  const mergedReport = {
+    ...testSummary.content,
+    test_detail: testDetail.content
+  };
+  
+  // Compress and save files concurrently
+  await Promise.all([
+    compressAndSave(mergedReport, 'test-result.json.gz'),
+    compressAndSave(reportHtml.content, 'report.html.gz')
+  ]);
 }
 
-const merged_report = {
-  ...test_summary.content,
-  test_detail: test_detail.content
+async function readTextFile(filePath: string): Promise<FileData> {
+  const fileData: FileData = { file: null, content: null };
+  
+  try {
+    fileData.file = Bun.file(filePath);
+    fileData.content = await fileData.file.text();
+  } catch (error) {
+    console.error(`Error reading ${filePath}:`, error);
+    fileData.content = '';
+  }
+  
+  return fileData;
 }
 
-// Compress the JSON data
-const gzip_buffer = await gzipPromise(JSON.stringify(merged_report));
-
-// Save the compressed data
-const save = Bun.file(`test-result.json.gz`);
-await save.write(gzip_buffer);
-console.log('File successfully compressed and saved as summary.json.gz');
+// Execute the main function
+main().catch(error => {
+  console.error('[ERROR]: An unexpected error occurred:', error);
+  process.exit(1);
+});
