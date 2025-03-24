@@ -1,4 +1,4 @@
-import type { I_LoadtestApiK6, I_LoadtestApiRequestItemBase } from "../types/request";
+import type { I_LoadtestApiRequestItemBase } from "../types/request";
 
 export const getResponseCheck = (flow: I_LoadtestApiRequestItemBase, req_var: string) => {
   const { response } = flow

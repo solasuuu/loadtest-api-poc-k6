@@ -144,7 +144,7 @@ export const mockOptionStage: {
 
 export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
   type: "load_testing",
-  options: mockOptionStage.scalability_testing,
+  options: mockOptionStage.load_testing,
   precondition: [
     {
       type: "api",
@@ -185,7 +185,7 @@ export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
   postcondition: [],
   items: [
     {
-      name: "login_page",
+      name: "stock-count",
       steps: [
         {
           type: "api",
@@ -255,6 +255,6 @@ export const mockLoadtestApiRequest: I_LoadtestApiK6 = {
           // ],
         }
       ]
-    }
+    },
   ]
 }

@@ -21,7 +21,7 @@ export const setVariable = (flow: I_LoadtestApiRequestItemBase, req_var: string)
     }
   })
 
-  return set_varaible_items.join(',\n')
+  return set_varaible_items.join('\n')
 }
 
 export const replaceUseVariable = (template: string) => {

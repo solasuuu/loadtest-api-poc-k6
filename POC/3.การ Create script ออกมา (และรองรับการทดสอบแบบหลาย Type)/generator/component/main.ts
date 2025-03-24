@@ -23,7 +23,7 @@ export const main = (flow: I_LoadtestApiK6) => {
               return template_with_replaces
             })
           }})`
-        })
+        })?.join('\n')
       }
     }
   `)
