@@ -64,7 +64,5 @@ export default function(variables) {
       'status is 200': (r) => r.status === 200,
       'response time < 800ms': (r) => r.timings.duration < 800
     })
-    variables.user_id = req_0_0.json().user_id
-    variables.user_id2 = req_0_0.json().user_id2
   })
 }

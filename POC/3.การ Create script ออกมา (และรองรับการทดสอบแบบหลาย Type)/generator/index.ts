@@ -23,7 +23,6 @@ const mergedScript = async (flow: I_LoadtestApiK6): Promise<string> => {
   `)
 
   const full_script_with_replace_variables = replaceUseVariable(full_script)
-  console.log('full_script_with_replace_variables', full_script_with_replace_variables)
   return full_script_with_replace_variables
 }
 

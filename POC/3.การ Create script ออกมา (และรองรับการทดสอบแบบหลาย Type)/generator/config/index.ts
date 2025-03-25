@@ -1,4 +1,4 @@
-export const globals: {
+export const k6_globals: {
   variable_name: string;
   variables: {
     name: string
